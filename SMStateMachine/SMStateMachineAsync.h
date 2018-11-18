@@ -14,7 +14,7 @@
 /**
  The process events serialQueue. If `NULL` (default), the main serialQueue is used.
  */
-@property (nonatomic, strong) dispatch_queue_t *serialQueue;
+@property (nonatomic, strong) dispatch_queue_t serialQueue;
 
 -(void)postAsync:(NSString *)event;
 -(NSString *)postAsync:(NSString *)event after:(NSUInteger)milliseconds;
