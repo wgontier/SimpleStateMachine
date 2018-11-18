@@ -91,9 +91,6 @@
     [fromState _addTransition:transition];
 }
 
-
-
-
 - (void)validate {
     if ([self.states count] == 0) {
         [NSException raise:@"Invalid statemachine" format:@"No states"];
@@ -103,6 +100,7 @@
     }
     //TODO: Add more validations
 }
+
 
 - (void)post:(NSString *)event {
     SMStateMachineExecuteContext *context = [[SMStateMachineExecuteContext alloc] init];
@@ -129,6 +127,125 @@
     if (_curState == nil) {
         _curState = _initialState;
     }
+}
+
+
+
+-(void)reset
+{
+    _curState = _initialState;
+}
+
+
+
+//
+// Add-ons : Load FSM from Dictionary / JSON Data
+// William Gontier - Nov 2018
+//
+// Idea behind : https://gojs.net/latest/samples/stateChart.html
+//
+#define fieldForStatesArray @"nodeDataArray"
+#define fieldForStateId @"text"
+#define fieldForStateEntrySelectorId @"actionIn"
+#define fieldForStateExitSelectorId @"actionOut"
+
+#define fieldForLinksArray @"linkDataArray"
+#define fieldForLinkFromId @"from"
+#define fieldForLinkToId @"to"
+#define fieldForLinkEventId @"text"
+#define fieldForLinkSelectorId @"action"
+
+/**
+ Load FSM from a description stored in a disctionary
+ 
+ @param description Dictionary containing the FSM description
+ @return TRUE : OK, FALSE : KO
+ */
+-(BOOL)loadFromDescription:(NSDictionary *) description
+{
+    NSArray *statesDescription = description[fieldForStatesArray];
+    
+    for (NSDictionary *stateDescription in statesDescription)
+    {
+        if(stateDescription[fieldForStateId] == nil)
+        {
+            return(FALSE);
+        }
+        
+        SMState *state = [[SMState alloc] initWithName:stateDescription[fieldForStateId]];
+        if (state != nil)
+        {
+            if (stateDescription[fieldForStateEntrySelectorId] != nil)
+            {
+                SEL selector = NSSelectorFromString(stateDescription[fieldForStateEntrySelectorId]);
+                if ([self respondsToSelector:selector])
+                {
+                    [state setEntrySelector:selector];
+                }
+                else return(FALSE);
+            }
+            if (stateDescription[fieldForStateExitSelectorId] != nil)
+            {
+                SEL selector = NSSelectorFromString(stateDescription[fieldForStateExitSelectorId]);
+                if ([self respondsToSelector:selector])
+                {
+                    [state setExitSelector:selector];
+                }
+                else return(FALSE);
+            }
+            else return(FALSE);
+        }
+        else return(FALSE);
+    }
+    
+    NSArray *linksDescription = description[fieldForStatesArray];
+
+    for (NSDictionary *linkDescription in linksDescription)
+    {
+        if(linkDescription[fieldForLinkFromId] == nil ||
+           linkDescription[fieldForLinkToId] == nil ||
+           linkDescription[fieldForLinkEventId] == nil)
+        {
+            return(FALSE);
+        }
+        
+        if (linkDescription[fieldForLinkSelectorId] != nil)
+        {
+            SEL selector = NSSelectorFromString(linkDescription[fieldForLinkSelectorId]);
+            if ([self respondsToSelector:selector])
+            {
+                [self transitionFrom:linkDescription[fieldForLinkFromId] to:linkDescription[fieldForLinkToId] forEvent:linkDescription[fieldForLinkEventId] withSel:selector];
+            }
+            else return(FALSE);
+        }
+        else
+        {
+            [self transitionFrom:linkDescription[fieldForLinkFromId] to:linkDescription[fieldForLinkToId] forEvent:linkDescription[fieldForLinkEventId]];
+        }
+    }
+    
+    return(TRUE);
+}
+
+
+
+/**
+ loadFromJSON
+
+ @param data JSON data containing the FSM description
+ @return TRUE : OK, FALSE : KO
+ */
+-(BOOL)loadFromJSON:(NSData*) data
+{
+    NSError *error;
+    
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    
+    if (error != nil) return(FALSE);
+    
+    if ( ! [self loadFromDescription:dictionary]) return(FALSE);
+    
+    return(TRUE);
 }
 
 @end

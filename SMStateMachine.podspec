@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.license      = 'MIT'
   s.author       = { "Artem Kireev" => "est1908@gmail.com" }
   s.source       = { :git => 'https://github.com/est1908/SimpleStateMachine.git', :tag => '1.1.1' }
-  s.platform     = :ios, '5.0'
+  s.platform     = :ios, '8.0'
   s.requires_arc = true
   s.source_files = 'SMStateMachine'  
 end

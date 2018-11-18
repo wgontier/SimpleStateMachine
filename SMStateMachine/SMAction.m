@@ -15,22 +15,37 @@
     return [[SMAction alloc] initWithSel:sel];
 }
 
-+ (SMAction *)actionWithSel:(SEL)sel executeIn:(NSObject *)executeInObj {
-    return [[SMAction alloc] initWithSel:sel executeIn:executeInObj];
++ (SMAction *)actionWithSel:(SEL)sel withObject:(id) obj {
+    return [[SMAction alloc] initWithSel:sel withObject:(id) obj];
+}
+
++ (SMAction *)actionWithSel:(SEL)sel executeIn:(NSObject *)executeInObj  {
+    return [[SMAction alloc] initWithSel:sel executeIn:executeInObj withObject:nil];
+}
+
++ (SMAction *)actionWithSel:(SEL)sel executeIn:(NSObject *)executeInObj withObject:(id) obj {
+    return [[SMAction alloc] initWithSel:sel executeIn:executeInObj withObject:obj];
 }
 
 
-- (id)initWithSel:(SEL)sel executeIn:(NSObject *)executeInObj {
+- (id)initWithSel:(SEL)sel executeIn:(NSObject *)executeInObj withObject:(id) obj {
     self = [super init];
     if (self) {
         _sel = sel;
         _executeInObj = executeInObj;
+        _userObj = obj;
     }
     return self;
 }
 
+
+- (id)initWithSel:(SEL)sel withObject:(id) obj {
+    return [self initWithSel:sel executeIn:nil withObject:(id) obj];
+}
+
+
 - (id)initWithSel:(SEL)sel {
-    return [self initWithSel:sel executeIn:nil];
+    return [self initWithSel:sel executeIn:nil withObject:nil];
 }
 
 - (void)execute {
@@ -47,7 +62,7 @@
     }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    [object performSelector:self.sel];
+    [object performSelector:self.sel withObject:_userObj];
 #pragma clang diagnostic pop
 }
 

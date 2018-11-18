@@ -12,9 +12,12 @@
 @class SMTransition;
 
 @interface SMState : SMNode
+
 - (id)initWithName:(NSString *)name;
 
 - (void)setEntrySelector:(SEL)entrySel executeIn:(NSObject *)object;
+
+- (void)setEntrySelector:(SEL)entrySel withObject:(id)obj;
 
 - (void)setEntrySelector:(SEL)entrySel;
 

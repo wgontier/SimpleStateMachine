@@ -19,8 +19,14 @@
     return [super initWithName:name];
 }
 
+
 - (void)setEntrySelector:(SEL)entrySel executeIn:(NSObject *)object {
     self.entry = [SMAction actionWithSel:entrySel executeIn:object];
+}
+
+- (void)setEntrySelector:(SEL)entrySel withObject:(id)obj;
+{
+    self.entry = [SMAction actionWithSel:entrySel withObject:obj];
 }
 
 - (void)setExitSelector:(SEL)exitSel executeIn:(NSObject *)object {

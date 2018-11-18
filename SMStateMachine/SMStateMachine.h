@@ -66,6 +66,12 @@
 
 - (void)validate;
 
+
+-(BOOL)loadFromDescription:(NSDictionary*) description;
+-(BOOL)loadFromJSON:(NSData*) data;
+-(void)reset;
+
+
 @property(nonatomic, weak) NSObject *globalExecuteIn;
 @property(nonatomic, readonly) SMNode *curState;
 @property(nonatomic) SMNode *initialState;
